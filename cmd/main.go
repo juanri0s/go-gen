@@ -40,6 +40,6 @@ func repoHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`created`))
 	default:
-		fmt.Fprintf(w, "Only GET and POST methods are supported")
+		fmt.Fprintf(w, "Only POST is supported")
 	}
 }
