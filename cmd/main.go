@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
 	"syscall"
 	"time"
@@ -60,8 +61,19 @@ func repoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: read in a path
+	path := "test"
+	if token == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`Invalid Path`))
+		return
+	}
+
 	switch r.Method {
 	case "POST":
+		createProject(path)
+		initRepo(path)
+
 		ctx := context.Background()
 		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 		tc := oauth2.NewClient(ctx, ts)
@@ -79,9 +91,44 @@ func repoHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		setRepoURL(path)
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`Successfully created new repo:` + repo.GetName()))
 	default:
 		fmt.Fprintf(w, "Only POST is supported")
 	}
 }
+
+func createProject(p string) {
+	// Check if the directory exists first
+	if _, err := os.Stat(p); os.IsNotExist(err) {
+		err := os.Mkdir(p, 0755)
+		if err != nil {
+			fmt.Println("%s", err.Error())
+		}
+	}
+}
+
+func initRepo(p string) {
+	// initalize the repo as a git repo
+	cmd := exec.Command("git", "init")
+	cmd.Dir = p
+	// TODO: return some kind of progress to the user
+	_, err := cmd.Output()
+	if err != nil {
+		fmt.Println("%s", err.Error())
+	}
+}
+
+func setRepoURL(p string) {
+	// TODO: take the github repo url and set it as the origin
+	cmd := exec.Command("git", "remote", "add", "origin", "")
+	cmd.Dir = p
+	// TODO: return some kind of progress to the user
+	_, err := cmd.Output()
+	if err != nil {
+		fmt.Println("%s", err.Error())
+	}
+}
+
+// Flow: 1. Create Dir 2. Apply the Template from the spec 3. Create the repo in GH 4. Set the repo url returned to the project
