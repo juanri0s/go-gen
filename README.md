@@ -9,10 +9,14 @@
 
 ## Dependencies
 
-`github.com/google/go-github`
-`github.com/google/go-github/v32`
-`golang.org/x/oauth2`
+- `github.com/google/go-github`
+- `golang.org/x/oauth2`
 
 ## License
 
 ## Roadmap
+- [ ] Create PR from the templated service
+- [ ] Support permissions throughout the process 
+- [ ] Support GH Repo configuration
+- [ ] Support editing/deleting in case of a mistake
+- [ ] Service creation progress updates
