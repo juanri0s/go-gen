@@ -8,6 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/google/go-github/github"
+	"golang.org/x/oauth2"
 )
 
 const version = "1.0.0"
@@ -33,7 +36,7 @@ func main() {
 		defer cancel()
 
 		if err := srv.Shutdown(ctx); err != nil {
-			fmt.Println("http server: %s", err.Error())
+			fmt.Println("http server shutdown: %s", err.Error())
 		}
 	}()
 
@@ -52,8 +55,26 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 func repoHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
+		token := os.Getenv("GITHUB_AUTH_TOKEN")
+		ctx := context.Background()
+		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+		tc := oauth2.NewClient(ctx, ts)
+		client := github.NewClient(tc)
+
+		repoCfg := &github.Repository{
+			Name:    github.String("test-repo1"),
+			Private: github.Bool(true),
+			// TODO: add in any other important configs
+		}
+		repo, _, err := client.Repositories.Create(ctx, "", repoCfg)
+		if err != nil {
+			fmt.Println("%s", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`created`))
+		w.Write([]byte(`Successfully created new repo:` + repo.GetName()))
 	default:
 		fmt.Fprintf(w, "Only POST is supported")
 	}
