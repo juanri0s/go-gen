@@ -1,2 +1,10 @@
 # auth0-exercise
-a go service that allows users to provision a new service based on their specs
+`auth0-exercise` is a go service that allows users to provision a new service based on their specs
+
+## Installation
+
+## Architecture
+
+## Examples
+
+## License
