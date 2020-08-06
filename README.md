@@ -7,4 +7,10 @@
 
 ## Examples
 
+## Dependencies
+
+`github.com/google/go-github`
+`github.com/google/go-github/v32`
+`golang.org/x/oauth2`
+
 ## License
