@@ -53,9 +53,15 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func repoHandler(w http.ResponseWriter, r *http.Request) {
+	token := os.Getenv("GITHUB_AUTH_TOKEN")
+	if token == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(`Invalid Github Auth Token`))
+		return
+	}
+
 	switch r.Method {
 	case "POST":
-		token := os.Getenv("GITHUB_AUTH_TOKEN")
 		ctx := context.Background()
 		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 		tc := oauth2.NewClient(ctx, ts)
