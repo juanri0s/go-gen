@@ -3,11 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
 	"syscall"
+	"text/template"
 	"time"
 
 	"github.com/google/go-github/github"
@@ -24,6 +27,7 @@ func main() {
 		WriteTimeout: timeout,
 	}
 
+	testTemplate()
 	http.HandleFunc("/health", healthHandler)
 	http.HandleFunc("/repository", repoHandler)
 
@@ -37,13 +41,13 @@ func main() {
 		defer cancel()
 
 		if err := srv.Shutdown(ctx); err != nil {
-			fmt.Println("http server shutdown: %s", err.Error())
+			fmt.Println(err.Error())
 		}
 	}()
 
 	fmt.Printf("Starting server at port 8080\n")
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		fmt.Println("http server:%s", err.Error())
+		fmt.Println(err.Error())
 		return
 	}
 }
@@ -86,14 +90,14 @@ func repoHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		repo, _, err := client.Repositories.Create(ctx, "", repoCfg)
 		if err != nil {
-			fmt.Println("%s", err.Error())
+			fmt.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
 		setRepoURL(path)
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`Successfully created new repo:` + repo.GetName()))
+		w.Write([]byte(`Successfully created new repo:` + repo.GetURL()))
 	default:
 		fmt.Fprintf(w, "Only POST is supported")
 	}
@@ -104,7 +108,7 @@ func createProject(p string) {
 	if _, err := os.Stat(p); os.IsNotExist(err) {
 		err := os.Mkdir(p, 0755)
 		if err != nil {
-			fmt.Println("%s", err.Error())
+			fmt.Println(err.Error())
 		}
 	}
 }
@@ -113,22 +117,57 @@ func initRepo(p string) {
 	// initalize the repo as a git repo
 	cmd := exec.Command("git", "init")
 	cmd.Dir = p
-	// TODO: return some kind of progress to the user
 	_, err := cmd.Output()
 	if err != nil {
-		fmt.Println("%s", err.Error())
+		fmt.Println(err.Error())
 	}
 }
 
 func setRepoURL(p string) {
 	// TODO: take the github repo url and set it as the origin
-	cmd := exec.Command("git", "remote", "add", "origin", "")
+	cmd := exec.Command("git", "remote", "add", "origin")
 	cmd.Dir = p
-	// TODO: return some kind of progress to the user
 	_, err := cmd.Output()
 	if err != nil {
-		fmt.Println("%s", err.Error())
+		fmt.Println(err.Error())
 	}
+}
+
+// Example TODO:
+type Example struct {
+	ServicePackage string
+	Copyright      bool
+	DefaultImports string
+}
+
+func testTemplate() {
+	var one = Example{
+		"main", true, `"fmt", "os"`,
+	}
+
+	templateText, err := ioutil.ReadFile("./generator/templates/main.gotmpl")
+	if err != nil {
+		log.Fatalf("parsing: %s", err)
+	}
+	// Create a template, add the function map, and parse the text.
+	tmpl, err := template.New("Main").Parse(string(templateText))
+	if err != nil {
+		log.Fatalf("parsing: %s", err)
+	}
+
+	f, err := os.Create("./generator/templates/testing.go")
+	if err != nil {
+		log.Println("create file: ", err)
+		return
+	}
+
+	// Run the template to verify the output.
+	err = tmpl.Execute(f, one)
+	if err != nil {
+		log.Fatalf("execution: %s", err)
+	}
+
+	f.Close()
 }
 
 // Flow: 1. Create Dir 2. Apply the Template from the spec 3. Create the repo in GH 4. Set the repo url returned to the project

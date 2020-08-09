@@ -16,7 +16,8 @@
 
 ## Roadmap
 - [ ] Create PR from the templated service
-- [ ] Support permissions throughout the process 
+- [ ] Support permissions throughout the process
 - [ ] Support GH Repo configuration
 - [ ] Support editing/deleting in case of a mistake
 - [ ] Service creation progress updates
+- [ ] VSCode Extension
