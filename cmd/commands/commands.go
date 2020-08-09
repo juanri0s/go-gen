@@ -34,7 +34,11 @@ func main() {
 				Email: "creator@auth0.com",
 			},
 		},
-		Copyright:            "2020 COPYRIGHT",
+		Copyright: `
+			Copyright 2020 Juan Rios. All rights reserved.
+			Use of this source code is governed by an MIT License
+			license that can be found in the LICENSE file.
+		`,
 		Version:              "0.0.1",
 		EnableBashCompletion: true,
 	}
@@ -42,7 +46,7 @@ func main() {
 	fileFlag := []cli.Flag{
 		&cli.StringFlag{
 			Name:  "file, f",
-			Usage: "spec file used to manage options for the service",
+			Usage: "file used to manage custom metadata for the service",
 		},
 	}
 
@@ -92,5 +96,7 @@ func generateServiceFromFile(f string) {
 			panic(err)
 		}
 	}
+
+	// TODO: now that I have the key/val -> generate template from values
 
 }
