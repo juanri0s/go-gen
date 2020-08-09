@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
 	"github.com/urfave/cli/v2"
+	"gopkg.in/yaml.v2"
 )
 
-// Service represents the metadata used to create a new service.
-type Service struct {
+// Metadata is the metadata used to create a new service.
+type Metadata struct {
 	Name        string
 	Owner       string
 	Version     string
@@ -17,8 +19,7 @@ type Service struct {
 	License     bool
 	Description string
 	Entrypoint  string
-	Tags        []string
-	GitIgnore   string
+	GitIgnore   bool
 }
 
 func main() {
@@ -72,5 +73,13 @@ func generateServiceDefault() {
 }
 
 func generateServiceFromSpec(f string) {
-	fmt.Println("works 2")
+	var metadata Metadata
+	data, err := ioutil.ReadFile(f)
+	if err != nil {
+		panic(err)
+	}
+	err = yaml.Unmarshal(data, &metadata)
+	if err != nil {
+		panic(err)
+	}
 }
