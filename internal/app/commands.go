@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"bytes"
@@ -11,12 +11,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/go-github/github"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v2"
 )
 
 // Metadata is the metadata used to create a new service.
 type Metadata struct {
+	ProjectPath string
 	Name        string
 	Owner       string
 	Version     string
@@ -100,9 +102,13 @@ func generateServiceFromFile(f string) {
 		}
 	}
 
-	generate(metadata)
-	// TODO: now that I have the key/val -> generate template from values
+	// Instead of asking the user for a path, we would like them to run the command in the WD they want
+	metadata.ProjectPath, err = os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+	}
 
+	generate(metadata)
 }
 
 func generate(m Metadata) {
@@ -127,5 +133,11 @@ func generate(m Metadata) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(body)
+	var repo *github.Repository
+	err = json.Unmarshal(body, &repo)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	fmt.Println(repo.GetURL())
 }
