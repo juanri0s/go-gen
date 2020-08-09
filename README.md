@@ -5,14 +5,15 @@
 
 ## Architecture
 
-## Examples
-
 ## Dependencies
 
 - `github.com/google/go-github`
 - `golang.org/x/oauth2`
+- `github.com/urfave/cli/v2`
+- `gopkg.in/yaml.v2`
 
 ## License
+auth0-exercise is licensed under the MIT License. Please see the LICENSE file for details.
 
 ## Roadmap
 - [ ] Create PR from the templated service

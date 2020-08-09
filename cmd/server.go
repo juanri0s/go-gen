@@ -64,6 +64,7 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// TODO: deletion candidate
 func createProject(p string) {
 	// Check if the directory exists first
 	if _, err := os.Stat(p); os.IsNotExist(err) {
