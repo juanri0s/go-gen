@@ -1,16 +1,54 @@
-package commands
+package main
 
 import (
-	"flag"
 	"fmt"
+	"log"
+	"os"
+
+	"github.com/urfave/cli/v2"
 )
 
-func generateFromSpec() {
-	fPackage := flag.String("package", "main", "package test")
-	fCopyright := flag.Bool("copyright", true, "copyright test")
-	fImports := flag.String("imports", "", "import test")
+func main() {
+	app := &cli.App{
+		Name:                 "auth0-exercise-cli",
+		Usage:                "interact with the service provisioner",
+		Version:              "0.0.1",
+		EnableBashCompletion: true,
+	}
 
-	flag.Parse()
+	app.Commands = []*cli.Command{
+		{
+			Name:    "generate",
+			Aliases: []string{"g"},
+			Usage:   "generate a new service",
+			Action: func(c *cli.Context) error {
+				generateServiceDefault()
+				return nil
+			},
+			Subcommands: []*cli.Command{
+				{
+					Name:    "file",
+					Aliases: []string{"f"},
+					Usage:   "applys specs to the service being created",
+					Action: func(c *cli.Context) error {
+						generateServiceFromSpec()
+						return nil
+					},
+				},
+			},
+		},
+	}
 
-	fmt.Printf("textPtr: %s, metricPtr: %t, uniquePtr: %s\n", *fPackage, *fCopyright, *fImports)
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func generateServiceFromSpec() {
+	fmt.Println("works 1")
+}
+
+func generateServiceDefault() {
+	fmt.Println("works 2")
 }
