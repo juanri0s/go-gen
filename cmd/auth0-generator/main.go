@@ -8,5 +8,6 @@ import (
 
 func main() {
 	log.Println("auth0-generator has started")
-	app.Start()
+	app.StartServer()
+	app.StartCLI()
 }

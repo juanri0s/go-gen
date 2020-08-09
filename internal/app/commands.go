@@ -29,56 +29,6 @@ type Metadata struct {
 	GitIgnore   bool
 }
 
-func main() {
-	app := &cli.App{
-		Name:  "auth0-exercise-cli",
-		Usage: "interact with the service provisioner",
-		Authors: []*cli.Author{
-			{
-				Name:  "Creator",
-				Email: "creator@auth0.com",
-			},
-		},
-		Copyright: `
-			Copyright 2020 Juan Rios. All rights reserved.
-			Use of this source code is governed by an MIT License
-			license that can be found in the LICENSE file.
-		`,
-		Version:              "0.0.1",
-		EnableBashCompletion: true,
-	}
-
-	fileFlag := []cli.Flag{
-		&cli.StringFlag{
-			Name:  "file, f",
-			Usage: "file used to manage custom metadata for the service",
-		},
-	}
-
-	app.Commands = []*cli.Command{
-		{
-			Name:    "generate",
-			Aliases: []string{"g"},
-			Usage:   "generate a new service",
-			Flags:   fileFlag,
-			Action: func(c *cli.Context) error {
-				f := c.String("file")
-				if f == "" {
-					generateServiceDefault()
-				}
-
-				generateServiceFromFile(f)
-				return nil
-			},
-		},
-	}
-
-	err := app.Run(os.Args)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func generateServiceDefault() {
 	fmt.Println("works 1")
 }
@@ -140,4 +90,55 @@ func generate(m Metadata) {
 	}
 
 	fmt.Println(repo.GetURL())
+}
+
+// StartCLI TODO
+func StartCLI() {
+	app := &cli.App{
+		Name:  "auth0-exercise-cli",
+		Usage: "interact with the service provisioner",
+		Authors: []*cli.Author{
+			{
+				Name:  "Creator",
+				Email: "creator@auth0.com",
+			},
+		},
+		Copyright: `
+			Copyright 2020 Juan Rios. All rights reserved.
+			Use of this source code is governed by an MIT License
+			license that can be found in the LICENSE file.
+		`,
+		Version:              "0.0.1",
+		EnableBashCompletion: true,
+	}
+
+	fileFlag := []cli.Flag{
+		&cli.StringFlag{
+			Name:  "file, f",
+			Usage: "file used to manage custom metadata for the service",
+		},
+	}
+
+	app.Commands = []*cli.Command{
+		{
+			Name:    "generate",
+			Aliases: []string{"g"},
+			Usage:   "generate a new service",
+			Flags:   fileFlag,
+			Action: func(c *cli.Context) error {
+				f := c.String("file")
+				if f == "" {
+					generateServiceDefault()
+				}
+
+				generateServiceFromFile(f)
+				return nil
+			},
+		},
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
