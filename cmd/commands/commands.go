@@ -10,10 +10,24 @@ import (
 
 func main() {
 	app := &cli.App{
-		Name:                 "auth0-exercise-cli",
-		Usage:                "interact with the service provisioner",
+		Name:  "auth0-exercise-cli",
+		Usage: "interact with the service provisioner",
+		Authors: []*cli.Author{
+			{
+				Name:  "Creator",
+				Email: "creator@auth0.com",
+			},
+		},
+		Copyright:            "2020 COPYRIGHT",
 		Version:              "0.0.1",
 		EnableBashCompletion: true,
+	}
+
+	fileFlag := []cli.Flag{
+		&cli.StringFlag{
+			Name:  "file, f",
+			Usage: "spec file used to manage options for the service",
+		},
 	}
 
 	app.Commands = []*cli.Command{
@@ -21,20 +35,15 @@ func main() {
 			Name:    "generate",
 			Aliases: []string{"g"},
 			Usage:   "generate a new service",
+			Flags:   fileFlag,
 			Action: func(c *cli.Context) error {
-				generateServiceDefault()
+				f := c.String("file")
+				if f == "" {
+					generateServiceDefault()
+				}
+
+				generateServiceFromSpec(f)
 				return nil
-			},
-			Subcommands: []*cli.Command{
-				{
-					Name:    "file",
-					Aliases: []string{"f"},
-					Usage:   "applys specs to the service being created",
-					Action: func(c *cli.Context) error {
-						generateServiceFromSpec()
-						return nil
-					},
-				},
 			},
 		},
 	}
@@ -45,10 +54,10 @@ func main() {
 	}
 }
 
-func generateServiceFromSpec() {
+func generateServiceDefault() {
 	fmt.Println("works 1")
 }
 
-func generateServiceDefault() {
+func generateServiceFromSpec(f string) {
 	fmt.Println("works 2")
 }
