@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v2"
@@ -97,6 +100,32 @@ func generateServiceFromFile(f string) {
 		}
 	}
 
+	generate(metadata)
 	// TODO: now that I have the key/val -> generate template from values
 
+}
+
+func generate(m Metadata) {
+	c := &http.Client{
+		Timeout: time.Second * 10,
+	}
+
+	req, err := json.Marshal(m)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	const url = "http://localhost:8080/respository"
+	resp, err := c.Post(url, "application/json", bytes.NewBuffer(req))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(body)
 }
