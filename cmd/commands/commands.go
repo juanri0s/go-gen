@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v2"
@@ -56,7 +58,7 @@ func main() {
 					generateServiceDefault()
 				}
 
-				generateServiceFromSpec(f)
+				generateServiceFromFile(f)
 				return nil
 			},
 		},
@@ -72,14 +74,23 @@ func generateServiceDefault() {
 	fmt.Println("works 1")
 }
 
-func generateServiceFromSpec(f string) {
+func generateServiceFromFile(f string) {
 	var metadata Metadata
 	data, err := ioutil.ReadFile(f)
 	if err != nil {
 		panic(err)
 	}
-	err = yaml.Unmarshal(data, &metadata)
-	if err != nil {
-		panic(err)
+
+	if strings.Contains(f, "yaml") || strings.Contains(f, "yml") {
+		err = yaml.Unmarshal(data, &metadata)
+		if err != nil {
+			panic(err)
+		}
+	} else if strings.Contains(f, "json") {
+		err = json.Unmarshal(data, &metadata)
+		if err != nil {
+			panic(err)
+		}
 	}
+
 }
