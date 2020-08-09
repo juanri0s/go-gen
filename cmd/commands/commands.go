@@ -8,6 +8,19 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// Service represents the metadata used to create a new service.
+type Service struct {
+	Name        string
+	Owner       string
+	Version     string
+	Copyright   bool
+	License     bool
+	Description string
+	Entrypoint  string
+	Tags        []string
+	GitIgnore   string
+}
+
 func main() {
 	app := &cli.App{
 		Name:  "auth0-exercise-cli",
