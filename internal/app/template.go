@@ -17,14 +17,14 @@ func setupService(m Metadata) error {
 	}
 
 	if m.HasGitIgnore {
-		err = templateService("gitignore", m)
+		err = addFileFromTemplate("gitignore", m)
 		if err != nil {
 			return err
 		}
 	}
 
 	if m.HasLicense {
-		err = templateService("license", m)
+		err = addFileFromTemplate("license", m)
 		if err != nil {
 			return err
 		}
@@ -35,12 +35,12 @@ func setupService(m Metadata) error {
 		return err
 	}
 
-	err = templateService("main", m)
+	err = addFileFromTemplate("main", m)
 	if err != nil {
 		return err
 	}
 
-	err = templateService("docker", m)
+	err = addFileFromTemplate("docker", m)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func makeDir(m Metadata) error {
 	return nil
 }
 
-func templateService(fType string, m Metadata) error {
+func addFileFromTemplate(fType string, m Metadata) error {
 	var tmplPath string
 	var path string
 	var file string
