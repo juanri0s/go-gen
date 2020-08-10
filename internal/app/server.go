@@ -137,7 +137,9 @@ func StartServer() {
 		quit := make(chan os.Signal, 1)
 		signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 		sig := <-quit
-		log.Info("received shutdown signal: %v", sig)
+		log.WithFields(log.Fields{
+			"signal": sig,
+		}).Info("received shutdown signal")
 
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
@@ -147,7 +149,7 @@ func StartServer() {
 		}
 	}()
 
-	log.Info("starting server on port 8080\n")
+	log.Info("starting server on port 8080")
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Error(err.Error())
 		return
