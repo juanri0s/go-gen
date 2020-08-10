@@ -56,14 +56,7 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		entryPath, err := setupService(m)
-		if err != nil {
-			log.Error(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		err = templateRepo(entryPath, m)
+		err = setupService(m)
 		if err != nil {
 			log.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
