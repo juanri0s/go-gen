@@ -51,7 +51,21 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		err := initRepo(m.ProjectPath)
 		if err != nil {
-			log.Error("Error initializing git repo ", err.Error())
+			log.Error(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		entryPath, err := setupService(m)
+		if err != nil {
+			log.Error(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		err = templateRepo(entryPath, m)
+		if err != nil {
+			log.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -114,6 +128,16 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 
 func initRepo(p string) error {
 	cmd := exec.Command("git", "init")
+	cmd.Dir = p
+	_, err := cmd.Output()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func initMod(p string) error {
+	cmd := exec.Command("go", "mod", "init")
 	cmd.Dir = p
 	_, err := cmd.Output()
 	if err != nil {

@@ -30,6 +30,7 @@ type Metadata struct {
 	Version      string
 	HasCopyright bool
 	HasLicense   bool
+	Imports      string
 	Description  string
 	Entrypoint   string
 	HasGitIgnore bool
@@ -46,8 +47,9 @@ func (m *Metadata) new() Metadata {
 		Version:      "1.0.0",
 		HasCopyright: true,
 		HasLicense:   true,
+		Imports:      DefaultImports,
 		Description:  "A default service for Auth0",
-		Entrypoint:   "/app",
+		Entrypoint:   "/default-service",
 		HasGitIgnore: true,
 		MainBranch:   "main",
 		IsPrivate:    true,
