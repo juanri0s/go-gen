@@ -3,8 +3,6 @@ package app
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -13,6 +11,7 @@ import (
 	"time"
 
 	"github.com/google/go-github/github"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 )
 
@@ -51,8 +50,11 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 		// 	panic(err)
 		// }
 
-		createProject(path)
-		initRepo(path)
+		err := initRepo(path)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
 		ctx := context.Background()
 		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
@@ -65,7 +67,7 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 			// TODO: add in any other important configs
 		}
 
-		repo, resp, err := client.Repositories.Create(ctx, "", repoCfg)
+		repo, _, err := client.Repositories.Create(ctx, "", repoCfg)
 		if _, ok := err.(*github.RateLimitError); ok {
 			log.Println("hit rate limit")
 			w.WriteHeader(r.Response.StatusCode)
@@ -77,12 +79,15 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if err != nil {
-			fmt.Println(resp.Status)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		setRepoURL(path)
+		err = setRepoURL(path)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(repo)
@@ -92,35 +97,26 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// TODO: deletion candidate
-func createProject(p string) {
-	// Check if the directory exists first
-	if _, err := os.Stat(p); os.IsNotExist(err) {
-		err := os.Mkdir(p, 0755)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-	}
-}
-
-func initRepo(p string) {
+func initRepo(p string) error {
 	// initalize the repo as a git repo
 	cmd := exec.Command("git", "init")
 	cmd.Dir = p
 	_, err := cmd.Output()
 	if err != nil {
-		fmt.Println(err.Error())
+		return err
 	}
+	return nil
 }
 
-func setRepoURL(p string) {
+func setRepoURL(p string) error {
 	// TODO: take the github repo url and set it as the origin
 	cmd := exec.Command("git", "remote", "add", "origin")
 	cmd.Dir = p
 	_, err := cmd.Output()
 	if err != nil {
-		fmt.Println(err.Error())
+		return err
 	}
+	return nil
 }
 
 // Flow: 1. Create Dir 2. Apply the Template from the spec 3. Create the repo in GH 4. Set the repo url returned to the project
@@ -141,19 +137,19 @@ func StartServer() {
 		quit := make(chan os.Signal, 1)
 		signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 		sig := <-quit
-		fmt.Println("received shutdown signal:", sig)
+		log.Info("received shutdown signal: %v", sig)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
 		if err := srv.Shutdown(ctx); err != nil {
-			fmt.Println(err.Error())
+			log.Error(err.Error())
 		}
 	}()
 
-	fmt.Printf("starting server at port 8080\n")
+	log.Info("starting server on port 8080\n")
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		fmt.Println(err.Error())
+		log.Error(err.Error())
 		return
 	}
 }

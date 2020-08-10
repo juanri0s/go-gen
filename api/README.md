@@ -11,6 +11,7 @@
 - `golang.org/x/oauth2`
 - `github.com/urfave/cli/v2`
 - `gopkg.in/yaml.v2`
+- `github.com/sirupsen/logrus`
 
 ## License
 auth0-exercise is licensed under the MIT License. Please see the LICENSE file for details.
