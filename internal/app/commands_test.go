@@ -1,7 +1,6 @@
 package app
 
 import (
-	"os"
 	"reflect"
 	"testing"
 
@@ -55,7 +54,18 @@ func Test_generateServiceFromDefault(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "Error on empty token",
+			args:    args{""},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "Error on invalid or expired token",
+			args:    args{"abc"},
+			want:    "",
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -66,26 +76,6 @@ func Test_generateServiceFromDefault(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("generateServiceFromDefault() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_getWorkingDirectory(t *testing.T) {
-	wd, _ := os.Getwd()
-	tests := []struct {
-		name string
-		want string
-	}{
-		{
-			name: "retrieve wd",
-			want: wd,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getWorkingDirectory(); got != tt.want {
-				t.Errorf("getWorkingDirectory() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -102,7 +92,36 @@ func Test_generateServiceFromFile(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "Error on empty file",
+			args:    args{"", "abc"},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "Error on invalid or empty token",
+			args:    args{"abc", ""},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "Error on invalid file",
+			args:    args{"abc", "abc"},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "Error on invalid or unsupported file type",
+			args:    args{"./test/assets/test.txt", "abc"},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name:    "Error on invalid json marshal",
+			args:    args{"./test/assets/test.json", "abc"},
+			want:    "",
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

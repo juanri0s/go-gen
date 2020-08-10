@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"os"
@@ -31,7 +32,7 @@ func setupService(m Metadata) error {
 		}
 	}
 
-	err = makeDir(m)
+	err = makeDirForEntry(m)
 	if err != nil {
 		return err
 	}
@@ -50,14 +51,23 @@ func setupService(m Metadata) error {
 }
 
 // makeDir sets up the main logic directory with entrypoint.
-func makeDir(m Metadata) error {
-	entryPath := m.ProjectPath + "/cmd" + m.Entrypoint
+func makeDirForEntry(m Metadata) error {
+	if m.ProjectPath == "" {
+		return fmt.Errorf("Invalid project path from metadata")
+	}
+	if m.Entrypoint == "" {
+		return fmt.Errorf("Invalid entrypoint from metadata")
+	}
+
+	entryPath := m.ProjectPath + "/cmd/" + m.Entrypoint
 	_, err := os.Stat(entryPath)
 	if os.IsNotExist(err) {
-		err := os.MkdirAll(entryPath, 0755)
-		if err != nil {
-			return err
-		}
+		return err
+	}
+
+	err = os.MkdirAll(entryPath, 0755)
+	if err != nil {
+		return err
 	}
 	return nil
 }

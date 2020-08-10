@@ -58,6 +58,9 @@ func (m *Metadata) new() Metadata {
 
 // generateServiceFromDefault creates a new service based on the default configurations.
 func generateServiceFromDefault(token string) (string, error) {
+	if token == "" {
+		return "", fmt.Errorf("token value cannot be empty")
+	}
 	var g Generator
 	var m Metadata
 	m = m.new()
@@ -71,18 +74,15 @@ func generateServiceFromDefault(token string) (string, error) {
 	return repo, nil
 }
 
-// getWorkingDirectory returns the current working directory.
-func getWorkingDirectory() string {
-	p, err := os.Getwd()
-	if err != nil {
-		log.Error("Error getting working directory")
-		return ""
-	}
-	return p
-}
-
 // generateServiceFromFile creates a new service based on the given file configurations.
 func generateServiceFromFile(f string, token string) (string, error) {
+	if token == "" {
+		return "", fmt.Errorf("token value cannot be empty")
+	}
+	if f == "" {
+		return "", fmt.Errorf("file value cannot be empty")
+	}
+
 	var g Generator
 	var m Metadata
 	data, err := ioutil.ReadFile(f)
@@ -91,19 +91,25 @@ func generateServiceFromFile(f string, token string) (string, error) {
 	}
 
 	if strings.Contains(f, "yaml") || strings.Contains(f, "yml") {
-		err = yaml.Unmarshal(data, &m)
+		err := yaml.Unmarshal(data, &m)
 		if err != nil {
 			return "", err
 		}
 	} else if strings.Contains(f, "json") {
-		err = json.Unmarshal(data, &m)
+		err := json.Unmarshal(data, &m)
 		if err != nil {
 			return "", err
 		}
+	} else {
+		return "", fmt.Errorf("Invalid or unsupported file type")
 	}
 
 	// Instead of asking the user for a path, we would like them to run the command in the WD they want
-	m.ProjectPath = getWorkingDirectory()
+	m.ProjectPath, err = os.Getwd()
+	if err != nil {
+		log.Error("Error getting working directory")
+		m.ProjectPath = ""
+	}
 
 	g.Metadata = m
 	g.Token = token
