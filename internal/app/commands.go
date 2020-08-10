@@ -16,6 +16,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Generator TODO
+type Generator struct {
+	Token    string
+	Metadata Metadata
+}
+
 // Metadata is the metadata used to create a new service.
 type Metadata struct {
 	ProjectPath  string
@@ -48,10 +54,13 @@ func (m *Metadata) new() Metadata {
 	}
 }
 
-func generateServiceFromDefault() (string, error) {
+func generateServiceFromDefault(token string) (string, error) {
+	var g Generator
 	var m Metadata
 	m = m.new()
-	repo, err := generate(m)
+	g.Metadata = m
+	g.Token = token
+	repo, err := g.generate()
 	if err != nil {
 		return "", err
 	}
@@ -68,7 +77,8 @@ func getWorkingDirectory() string {
 	return p
 }
 
-func generateServiceFromFile(f string) (string, error) {
+func generateServiceFromFile(f string, token string) (string, error) {
+	var g Generator
 	var m Metadata
 	data, err := ioutil.ReadFile(f)
 	if err != nil {
@@ -90,19 +100,22 @@ func generateServiceFromFile(f string) (string, error) {
 	// Instead of asking the user for a path, we would like them to run the command in the WD they want
 	m.ProjectPath = getWorkingDirectory()
 
-	repo, err := generate(m)
+	g.Metadata = m
+	g.Token = token
+
+	repo, err := g.generate()
 	return repo, nil
 }
 
-func generate(m Metadata) (string, error) {
+func (g *Generator) generate() (string, error) {
 	log.WithFields(log.Fields{
-		"repo-name": m.Name,
+		"repo-name": g.Metadata.Name,
 	}).Info("generating Auth0 service")
 	c := &http.Client{
 		Timeout: time.Second * 10,
 	}
 
-	req, err := json.Marshal(m)
+	req, err := json.Marshal(g)
 	if err != nil {
 		return "", err
 	}
@@ -153,10 +166,15 @@ func StartCLI() {
 		EnableBashCompletion: true,
 	}
 
-	fileFlag := []cli.Flag{
+	flags := []cli.Flag{
 		&cli.StringFlag{
 			Name:  "file, f",
-			Usage: "file used to manage custom metadata for the service",
+			Usage: "file used to manage custom metadata for the service (optional)",
+		},
+		&cli.StringFlag{
+			Name:     "token",
+			Usage:    "GH token to interact with GH API (required)",
+			Required: true,
 		},
 	}
 
@@ -165,19 +183,20 @@ func StartCLI() {
 			Name:    "generate",
 			Aliases: []string{"g"},
 			Usage:   "generate a new Auth0 service",
-			Flags:   fileFlag,
+			Flags:   flags,
 			Action: func(c *cli.Context) error {
 				t := time.Now()
 				f := c.String("file")
+				token := c.String("token")
 				var repo string
 				var err error
 				if f == "" {
-					repo, err = generateServiceFromDefault()
+					repo, err = generateServiceFromDefault(token)
 					if err != nil {
 						return fmt.Errorf("%w", err)
 					}
 				} else {
-					repo, err = generateServiceFromFile(f)
+					repo, err = generateServiceFromFile(f, token)
 					if err != nil {
 						return fmt.Errorf("%w", err)
 					}

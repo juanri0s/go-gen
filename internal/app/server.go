@@ -26,20 +26,21 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 
 // RepoHandler TODO
 func RepoHandler(w http.ResponseWriter, r *http.Request) {
-	token := os.Getenv("GITHUB_AUTH_TOKEN")
-	if token == "" {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(`invalid Github Token`))
-		return
-	}
-
-	var m Metadata
+	var g Generator
 	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&m)
+	err := decoder.Decode(&g)
 	if err != nil {
 		log.Error(err.Error())
 	}
 
+	token := g.Token
+	if token == "" {
+		log.Error("invalid GH token")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	m := g.Metadata
 	if m.ProjectPath == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`invalid path`))
