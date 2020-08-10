@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/juanri0s/auth0-exercise/api/internal/app"
+	"github.com/juanri0s/auth0-exercise/internal/app"
 )
 
 func main() {
