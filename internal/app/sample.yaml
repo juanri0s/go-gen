@@ -1,11 +1,11 @@
- name: "custom-repo"
+ name: "custom-yaml-repo"
  owner: "Juan"
  version: "1.0.0"
  hasCopyright: true
  hasLicense: true
- description: "A custom auth0 service"
- entrypoint: "custom-service"
+ description: "A custom auth0 service from a yaml spec"
+ entrypoint: "custom-yaml-service"
  hasGitignore: true
  isPrivate: true
- imports: `"fmt", "os"`
+ imports: '"fmt"'
  mainBranch: "main"
