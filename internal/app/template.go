@@ -7,9 +7,10 @@ import (
 	"strings"
 )
 
-// DefaultImports TODO
-const DefaultImports = `"fmt", "os"`
+// DefaultImports represents the default imports that we want the initial service to have.
+const DefaultImports = `"fmt"`
 
+// setupService sets up a service based on the configuration metadata.
 func setupService(m Metadata) error {
 	err := initMod(m.ProjectPath)
 	if err != nil {
@@ -48,6 +49,7 @@ func setupService(m Metadata) error {
 	return nil
 }
 
+// makeDir sets up the main logic directory with entrypoint.
 func makeDir(m Metadata) error {
 	entryPath := m.ProjectPath + "/cmd" + m.Entrypoint
 	_, err := os.Stat(entryPath)
@@ -60,6 +62,7 @@ func makeDir(m Metadata) error {
 	return nil
 }
 
+// addFileFromTemplate tempaltes a file based on the fileType and matching template.
 func addFileFromTemplate(fType string, m Metadata) error {
 	var tmplPath string
 	var path string

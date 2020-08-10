@@ -16,7 +16,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Generator TODO
+// Generator is the service generator using the GH token for repo creation and the metadata for the configured service.
 type Generator struct {
 	Token    string
 	Metadata Metadata
@@ -45,17 +45,18 @@ func (m *Metadata) new() Metadata {
 		Name:         "default-repo",
 		Owner:        "default-owner",
 		Version:      "1.0.0",
-		HasCopyright: true,
-		HasLicense:   true,
 		Imports:      DefaultImports,
 		Description:  "A default service for Auth0",
 		Entrypoint:   "default-service",
-		HasGitIgnore: true,
 		MainBranch:   "main",
 		IsPrivate:    true,
+		HasCopyright: true,
+		HasLicense:   true,
+		HasGitIgnore: true,
 	}
 }
 
+// generateServiceFromDefault creates a new service based on the default configurations.
 func generateServiceFromDefault(token string) (string, error) {
 	var g Generator
 	var m Metadata
@@ -70,6 +71,7 @@ func generateServiceFromDefault(token string) (string, error) {
 	return repo, nil
 }
 
+// getWorkingDirectory returns the current working directory.
 func getWorkingDirectory() string {
 	p, err := os.Getwd()
 	if err != nil {
@@ -79,6 +81,7 @@ func getWorkingDirectory() string {
 	return p
 }
 
+// generateServiceFromFile creates a new service based on the given file configurations.
 func generateServiceFromFile(f string, token string) (string, error) {
 	var g Generator
 	var m Metadata
@@ -109,6 +112,7 @@ func generateServiceFromFile(f string, token string) (string, error) {
 	return repo, nil
 }
 
+// generate takes a generator and generates the service through the api.
 func (g *Generator) generate() (string, error) {
 	log.WithFields(log.Fields{
 		"repo-name": g.Metadata.Name,
@@ -148,7 +152,7 @@ func (g *Generator) generate() (string, error) {
 	return repo.GetHTMLURL(), nil
 }
 
-// StartCLI TODO
+// StartCLI initializes the CLI start and exit.
 func StartCLI() {
 	app := &cli.App{
 		Name:  "auth0-exercise-cli",

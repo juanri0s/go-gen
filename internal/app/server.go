@@ -18,13 +18,13 @@ import (
 const version = "1.0.0"
 const timeout = 15 * time.Second
 
-// HealthHandler TODO:
+// HealthHandler checks for the healthiness of the api.
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`HEALTHY ` + version))
 }
 
-// RepoHandler TODO
+// RepoHandler manages the creation of a GH repository.
 func RepoHandler(w http.ResponseWriter, r *http.Request) {
 	var g Generator
 	decoder := json.NewDecoder(r.Body)
@@ -49,7 +49,7 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "POST":
-		err := initRepo(m.ProjectPath)
+		err := initGit(m.ProjectPath)
 		if err != nil {
 			log.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -119,7 +119,8 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func initRepo(p string) error {
+// initGit initializes a project as a git project
+func initGit(p string) error {
 	cmd := exec.Command("git", "init")
 	cmd.Dir = p
 	_, err := cmd.Output()
@@ -129,6 +130,7 @@ func initRepo(p string) error {
 	return nil
 }
 
+// initMod initializes a Go project with go modules.
 func initMod(p string) error {
 	cmd := exec.Command("go", "mod", "init")
 	cmd.Dir = p
@@ -139,6 +141,7 @@ func initMod(p string) error {
 	return nil
 }
 
+// setRepoURL sets a new remote address for the git project.
 func setRepoURL(p string, url string) error {
 	cmd := exec.Command("git", "remote", "add", "origin", url)
 	cmd.Dir = p
@@ -149,9 +152,7 @@ func setRepoURL(p string, url string) error {
 	return nil
 }
 
-// Flow: 1. Create Dir 2. Apply the Template from the spec 3. Create the repo in GH 4. Set the repo url returned to the project
-
-// StartServer TODO:
+// StartServer initializes the server and starts it with a graceful shutdown on signals.
 func StartServer() {
 	srv := &http.Server{
 		Addr:         ":8080",
