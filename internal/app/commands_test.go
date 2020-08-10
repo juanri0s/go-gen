@@ -21,7 +21,7 @@ func TestMetadata_new(t *testing.T) {
 		MainBranch:   "main",
 		Name:         "default-repo",
 		Owner:        "default-owner",
-		ProjectPath:  "C:\\Users\\Juan\\go\\src\\github.com\\juanri0s\\test\\",
+		ProjectPath:  "",
 		Version:      "1.0.0",
 	}
 	tests := []struct {

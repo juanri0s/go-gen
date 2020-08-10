@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // DefaultImports represents the default imports that we want the initial service to have.
@@ -62,9 +61,8 @@ func makeDirForEntry(m Metadata) error {
 	}
 
 	entryPath := m.ProjectPath + "/cmd/" + m.Entrypoint
-	log.WithFields(log.Fields{
-		"entry-path": entryPath,
-	}).Info("creating project entry path")
+
+	log.Printf("creating project entry path for %s", entryPath)
 
 	_, err := os.Stat(entryPath)
 	if os.IsNotExist(err) {

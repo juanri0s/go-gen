@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/google/go-github/github"
-	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v2"
 )
@@ -41,7 +40,7 @@ type Metadata struct {
 // new returns a new service with default metadata values.
 func (m *Metadata) new() Metadata {
 	return Metadata{
-		ProjectPath:  "C:\\Users\\Juan\\go\\src\\github.com\\juanri0s\\test\\",
+		ProjectPath:  "",
 		Name:         "default-repo",
 		Owner:        "default-owner",
 		Version:      "1.0.0",
@@ -64,6 +63,13 @@ func generateServiceFromDefault(token string) (string, error) {
 	var g Generator
 	var m Metadata
 	m = m.new()
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	m.ProjectPath = wd
+
 	g.Metadata = m
 	g.Token = token
 	repo, err := g.generate()
@@ -107,8 +113,7 @@ func generateServiceFromFile(f string, token string) (string, error) {
 	// Instead of asking the user for a path, we would like them to run the command in the WD they want
 	m.ProjectPath, err = os.Getwd()
 	if err != nil {
-		log.Error("Error getting working directory")
-		m.ProjectPath = ""
+		return "", err
 	}
 
 	g.Metadata = m
@@ -120,9 +125,7 @@ func generateServiceFromFile(f string, token string) (string, error) {
 
 // generate takes a generator and generates the service through the api.
 func (g *Generator) generate() (string, error) {
-	log.WithFields(log.Fields{
-		"repo-name": g.Metadata.Name,
-	}).Info("generating Auth0 service")
+	fmt.Printf("generating auth0 service for %s\n", g.Metadata.Name)
 	c := &http.Client{
 		Timeout: time.Second * 10,
 	}
@@ -213,11 +216,7 @@ func StartCLI(args []string) error {
 						return fmt.Errorf("%w", err)
 					}
 				}
-
-				log.WithFields(log.Fields{
-					"repo-link":      repo,
-					"execution-time": time.Since(t),
-				}).Info("successfully created Auth0 service")
+				fmt.Printf("successfully created auth0 service for %s in %d\n", repo, time.Since(t))
 				return nil
 			},
 		},
@@ -225,7 +224,7 @@ func StartCLI(args []string) error {
 
 	err := app.Run(args)
 	if err != nil {
-		log.Error(err.Error())
+		fmt.Printf("exiting cli - %s", err.Error())
 		return err
 	}
 	return nil
