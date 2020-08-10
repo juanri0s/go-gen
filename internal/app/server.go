@@ -159,7 +159,6 @@ func StartServer() {
 		WriteTimeout: timeout,
 	}
 
-	// testTemplate()
 	http.HandleFunc("/health", HealthHandler)
 	http.HandleFunc("/repository", RepoHandler)
 
