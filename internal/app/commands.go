@@ -216,7 +216,7 @@ func StartCLI(args []string) error {
 						return fmt.Errorf("%w", err)
 					}
 				}
-				fmt.Printf("successfully created auth0 service for %s in %d\n", repo, time.Since(t))
+				fmt.Printf("successfully created auth0 service for %s in %dms\n", repo, time.Since(t).Milliseconds())
 				return nil
 			},
 		},
