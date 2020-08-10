@@ -27,7 +27,7 @@ cd $GOPATH/src/github.com/{GH_USERNAME}/{PROJECT_NAME}
 
 providing a spec file allows you to customize the service being created, otherwise, the default options will be used.
 
-> Sample.yaml
+> sample.yaml
 ```yaml
  name: "custom-yaml-repo"
  owner: "Juan"
@@ -42,6 +42,23 @@ providing a spec file allows you to customize the service being created, otherwi
  mainBranch: "main"
 ```
 
+> sample.json
+```json
+{
+  "name": "custom-json-repo",
+  "owner": "Juan",
+  "version": "1.0.0",
+  "hasCopyright": true,
+  "hasLicense": true,
+  "description": "A custom auth0 service from a json spec",
+  "entrypoint": "custom-json-service",
+  "hasGitignore": true,
+  "isPrivate": true,
+  "imports": "\"fmt\"",
+  "mainBranch": "main"
+}
+```
+
 ### Run CLI Command
 
 For a default service
@@ -54,25 +71,24 @@ For a configured service
 auth0-exercise generate --token={GH_TOKEN} --file={spec.yaml OR spec.json}
 ```
 
-## Installation
-
-## Architecture
-
 ## Dependencies
 
-- `github.com/google/go-github`
-- `golang.org/x/oauth2`
-- `github.com/urfave/cli/v2`
-- `gopkg.in/yaml.v2`
-- `github.com/sirupsen/logrus`
+- `github.com/google/go-github` - github api
+- `golang.org/x/oauth2` - github auth
+- `github.com/urfave/cli/v2` - cli
+- `gopkg.in/yaml.v2` - yaml -> struct
+- `github.com/sirupsen/logrus` - server logging
 
 ## License
 `auth0-exercise` is licensed under the MIT License. Please see the LICENSE file for details.
 
 ## Roadmap
-- [ ] Create PR from the templated service
+- [ ] More Test Coverage
+- [ ] Create PR from the templated service (not available in GH api)
 - [ ] Support permissions throughout the process
 - [ ] Support GH Repo configuration
 - [ ] Support editing/deleting in case of a mistake
-- [ ] Service creation progress updates
+- [ ] Open Repoistory link after creation
 - [ ] VSCode Extension
+- [ ] Add Contributors
+- [ ] Add interactions to the CLI (ex: do you want to clone the repo ? (y/n))
