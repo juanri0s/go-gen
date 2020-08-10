@@ -46,7 +46,7 @@ func (m *Metadata) new() Metadata {
 		Owner:        "default-owner",
 		Version:      "1.0.0",
 		Imports:      DefaultImports,
-		Description:  "A default service for Auth0",
+		Description:  "A default service for auth0",
 		Entrypoint:   "default-service",
 		MainBranch:   "main",
 		IsPrivate:    true,
@@ -153,7 +153,7 @@ func (g *Generator) generate() (string, error) {
 }
 
 // StartCLI initializes the CLI start and exit.
-func StartCLI() {
+func StartCLI(args []string) error {
 	app := &cli.App{
 		Name:  "auth0-exercise-cli",
 		Usage: "interact with the service provisioner",
@@ -217,8 +217,10 @@ func StartCLI() {
 		},
 	}
 
-	err := app.Run(os.Args)
+	err := app.Run(args)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err.Error())
+		return err
 	}
+	return nil
 }

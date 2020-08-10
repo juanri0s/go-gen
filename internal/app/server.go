@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"os/exec"
@@ -121,6 +122,10 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 
 // initGit initializes a project as a git project
 func initGit(p string) error {
+	if p == "" {
+		return fmt.Errorf("invalid path")
+	}
+
 	cmd := exec.Command("git", "init")
 	cmd.Dir = p
 	_, err := cmd.Output()
@@ -132,6 +137,10 @@ func initGit(p string) error {
 
 // initMod initializes a Go project with go modules.
 func initMod(p string) error {
+	if p == "" {
+		return fmt.Errorf("invalid path")
+	}
+
 	cmd := exec.Command("go", "mod", "init")
 	cmd.Dir = p
 	_, err := cmd.Output()
@@ -143,6 +152,14 @@ func initMod(p string) error {
 
 // setRepoURL sets a new remote address for the git project.
 func setRepoURL(p string, url string) error {
+	if p == "" {
+		return fmt.Errorf("invalid path")
+	}
+
+	if url == "" {
+		return fmt.Errorf("invalid url")
+	}
+
 	cmd := exec.Command("git", "remote", "add", "origin", url)
 	cmd.Dir = p
 	_, err := cmd.Output()
