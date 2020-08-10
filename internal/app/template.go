@@ -99,10 +99,7 @@ func addFileFromTemplate(fType string, m Metadata) error {
 		file = ".gitignore"
 		break
 	default:
-		tmplPath = ""
-		path = ""
-		file = ""
-		break
+		return fmt.Errorf("Invalid or unsupported file type")
 	}
 
 	templateF, err := ioutil.ReadFile(tmplPath)

@@ -48,7 +48,26 @@ func Test_addFileFromTemplate(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "error on empty file type",
+			args:    args{"", Metadata{}},
+			wantErr: true,
+		},
+		{
+			name:    "error on invalid or unsupported file type",
+			args:    args{"unsupported", Metadata{}},
+			wantErr: true,
+		},
+		{
+			name:    "error on empty project path",
+			args:    args{"unsupported", Metadata{ProjectPath: ""}},
+			wantErr: true,
+		},
+		{
+			name:    "error on invalid project path",
+			args:    args{"unsupported", Metadata{ProjectPath: "abc"}},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
