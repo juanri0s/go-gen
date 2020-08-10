@@ -18,29 +18,33 @@ import (
 
 // Metadata is the metadata used to create a new service.
 type Metadata struct {
-	ProjectPath string
-	Name        string
-	Owner       string
-	Version     string
-	Copyright   bool
-	License     bool
-	Description string
-	Entrypoint  string
-	GitIgnore   bool
+	ProjectPath  string
+	Name         string
+	Owner        string
+	Version      string
+	HasCopyright bool
+	HasLicense   bool
+	Description  string
+	Entrypoint   string
+	HasGitIgnore bool
+	MainBranch   string
+	IsPrivate    bool
 }
 
 // new returns a new service with default metadata values.
 func (m *Metadata) new() Metadata {
 	return Metadata{
-		ProjectPath: "",
-		Name:        "default-repo",
-		Owner:       "default-owner",
-		Version:     "1.0.0",
-		Copyright:   true,
-		License:     true,
-		Description: "A default service for Auth0",
-		Entrypoint:  "/app",
-		GitIgnore:   true,
+		ProjectPath:  "C:\\Users\\Juan\\go\\src\\github.com\\juanri0s\\test\\",
+		Name:         "default-repo",
+		Owner:        "default-owner",
+		Version:      "1.0.0",
+		HasCopyright: true,
+		HasLicense:   true,
+		Description:  "A default service for Auth0",
+		Entrypoint:   "/app",
+		HasGitIgnore: true,
+		MainBranch:   "main",
+		IsPrivate:    true,
 	}
 }
 
@@ -53,6 +57,15 @@ func generateServiceFromDefault() (string, error) {
 	}
 
 	return repo, nil
+}
+
+func getWorkingDirectory() string {
+	p, err := os.Getwd()
+	if err != nil {
+		log.Error("Error getting working directory")
+		return ""
+	}
+	return p
 }
 
 func generateServiceFromFile(f string) (string, error) {
@@ -75,10 +88,7 @@ func generateServiceFromFile(f string) (string, error) {
 	}
 
 	// Instead of asking the user for a path, we would like them to run the command in the WD they want
-	m.ProjectPath, err = os.Getwd()
-	if err != nil {
-		return "", err
-	}
+	m.ProjectPath = getWorkingDirectory()
 
 	repo, err := generate(m)
 	return repo, nil
@@ -87,7 +97,7 @@ func generateServiceFromFile(f string) (string, error) {
 func generate(m Metadata) (string, error) {
 	log.WithFields(log.Fields{
 		"repo-name": m.Name,
-	}).Info("Generating Go service")
+	}).Info("generating Auth0 service")
 	c := &http.Client{
 		Timeout: time.Second * 10,
 	}
@@ -154,7 +164,7 @@ func StartCLI() {
 		{
 			Name:    "generate",
 			Aliases: []string{"g"},
-			Usage:   "generate a new service",
+			Usage:   "generate a new Auth0 service",
 			Flags:   fileFlag,
 			Action: func(c *cli.Context) error {
 				t := time.Now()
@@ -176,7 +186,7 @@ func StartCLI() {
 				log.WithFields(log.Fields{
 					"repo-link":      repo,
 					"execution-time": time.Since(t),
-				}).Info("Service created successfully")
+				}).Info("successfully created Auth0 service")
 				return nil
 			},
 		},

@@ -16,7 +16,7 @@ import (
 )
 
 const version = "1.0.0"
-const timeout = 120 * time.Second
+const timeout = 15 * time.Second
 
 // HealthHandler TODO:
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,9 +33,14 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: read in a path
-	path := "test"
-	if token == "" {
+	var m Metadata
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&m)
+	if err != nil {
+		log.Error(err.Error())
+	}
+
+	if m.ProjectPath == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`invalid path`))
 		return
@@ -43,15 +48,9 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "POST":
-		// var m
-		// decoder := json.NewDecoder(r.Body)
-		// err := decoder.Decode(&m)
-		// if err != nil {
-		// 	panic(err)
-		// }
-
-		err := initRepo(path)
+		err := initRepo(m.ProjectPath)
 		if err != nil {
+			log.Error("Error initializing git repo ", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -62,11 +61,18 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 		client := github.NewClient(tc)
 
 		repoCfg := &github.Repository{
-			Name:    github.String("test-repo"),
-			Private: github.Bool(true),
+			Name:          github.String(m.Name),
+			Private:       github.Bool(m.IsPrivate),
+			AutoInit:      github.Bool(true),
+			DefaultBranch: github.String(m.MainBranch),
 			// TODO: add in any other important configs
 		}
 
+		log.WithFields(log.Fields{
+			"repo-name": m.Name,
+		}).Info("creating Github Repository")
+
+		t := time.Now()
 		repo, _, err := client.Repositories.Create(ctx, "", repoCfg)
 		if _, ok := err.(*github.RateLimitError); ok {
 			log.Warn("hit rate limit")
@@ -79,15 +85,23 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if err != nil {
+			log.Error(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		err = setRepoURL(path)
+		err = setRepoURL(m.ProjectPath, repo.GetGitURL())
 		if err != nil {
+			log.Error("Error setting repo url ", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+
+		log.WithFields(log.Fields{
+			"repo-name":      m.Name,
+			"repo-link":      repo.GetHTMLURL(),
+			"execution-time": time.Since(t),
+		}).Info("successfully created Github Repository")
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(repo)
@@ -98,7 +112,6 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func initRepo(p string) error {
-	// initalize the repo as a git repo
 	cmd := exec.Command("git", "init")
 	cmd.Dir = p
 	_, err := cmd.Output()
@@ -108,9 +121,8 @@ func initRepo(p string) error {
 	return nil
 }
 
-func setRepoURL(p string) error {
-	// TODO: take the github repo url and set it as the origin
-	cmd := exec.Command("git", "remote", "add", "origin")
+func setRepoURL(p string, url string) error {
+	cmd := exec.Command("git", "remote", "add", "origin", url)
 	cmd.Dir = p
 	_, err := cmd.Output()
 	if err != nil {
