@@ -1,1 +1,1 @@
-web: cmd/auth0-api
+web: cmd/auth0-api/main.go
