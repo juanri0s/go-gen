@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // DefaultImports represents the default imports that we want the initial service to have.
@@ -60,14 +62,16 @@ func makeDirForEntry(m Metadata) error {
 	}
 
 	entryPath := m.ProjectPath + "/cmd/" + m.Entrypoint
+	log.WithFields(log.Fields{
+		"entry-path": entryPath,
+	}).Info("creating project entry path")
+
 	_, err := os.Stat(entryPath)
 	if os.IsNotExist(err) {
-		return err
-	}
-
-	err = os.MkdirAll(entryPath, 0755)
-	if err != nil {
-		return err
+		err := os.MkdirAll(entryPath, 0755)
+		if err != nil {
+			return fmt.Errorf("unable to make directory for %s - %w", entryPath, err)
+		}
 	}
 	return nil
 }
@@ -80,7 +84,7 @@ func addFileFromTemplate(fType string, m Metadata) error {
 	switch strings.ToLower(fType) {
 	case "main":
 		tmplPath = "internal/app/templates/simple-main.gotmpl"
-		path = m.ProjectPath + "/cmd" + m.Entrypoint + "/"
+		path = m.ProjectPath + "/cmd/" + m.Entrypoint + "/"
 		file = "main.go"
 		break
 	case "docker":
@@ -104,23 +108,23 @@ func addFileFromTemplate(fType string, m Metadata) error {
 
 	templateF, err := ioutil.ReadFile(tmplPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to read template file from %s  - %w", tmplPath, err)
 	}
 	// Create a template, add the function map, and parse the text.
 	tmpl, err := template.New("").Parse(string(templateF))
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to parse template file - %w", err)
 	}
 
 	f, err := os.Create(path + file)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to create file from path %s - %w", path+file, err)
 	}
 
 	// Run the template to verify the output.
 	err = tmpl.Execute(f, m)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to execute templating - %w", err)
 	}
 
 	f.Close()

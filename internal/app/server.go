@@ -130,7 +130,7 @@ func initGit(p string) error {
 	cmd.Dir = p
 	_, err := cmd.Output()
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to initalize project as git repo - %w", err)
 	}
 	return nil
 }
@@ -145,7 +145,7 @@ func initMod(p string) error {
 	cmd.Dir = p
 	_, err := cmd.Output()
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to initalize project with go mod - %w", err)
 	}
 	return nil
 }
@@ -164,7 +164,7 @@ func setRepoURL(p string, url string) error {
 	cmd.Dir = p
 	_, err := cmd.Output()
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to set %s on repo  - %w", url, err)
 	}
 	return nil
 }
