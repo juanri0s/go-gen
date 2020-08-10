@@ -1,0 +1,1 @@
+web: cmd/auth0-api
