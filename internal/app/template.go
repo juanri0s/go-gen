@@ -46,7 +46,6 @@ func setupService(m Metadata) error {
 	}
 
 	return nil
-	// TODO: create /cmd/entry, create /internal/app, run go mod init, get .gitignore, get license, get dockerfile
 }
 
 func makeDir(m Metadata) error {
@@ -72,9 +71,9 @@ func templateService(fType string, m Metadata) error {
 		file = "main.go"
 		break
 	case "docker":
-		tmplPath = "internal/app/templates/docker.tmpl"
+		tmplPath = "internal/app/templates/dockerfile.tmpl"
 		path = m.ProjectPath
-		file = "TEST.TXT"
+		file = "Dockerfile"
 		break
 	case "license":
 		tmplPath = "internal/app/templates/license.tmpl"

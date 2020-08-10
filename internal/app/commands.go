@@ -49,7 +49,7 @@ func (m *Metadata) new() Metadata {
 		HasLicense:   true,
 		Imports:      DefaultImports,
 		Description:  "A default service for Auth0",
-		Entrypoint:   "/default-service",
+		Entrypoint:   "default-service",
 		HasGitIgnore: true,
 		MainBranch:   "main",
 		IsPrivate:    true,
