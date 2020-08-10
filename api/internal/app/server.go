@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -29,7 +30,7 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 	token := os.Getenv("GITHUB_AUTH_TOKEN")
 	if token == "" {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(`Invalid Github Auth Token`))
+		w.Write([]byte(`invalid Github Token`))
 		return
 	}
 
@@ -37,7 +38,7 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 	path := "test"
 	if token == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`Invalid Path`))
+		w.Write([]byte(`invalid path`))
 		return
 	}
 
@@ -59,24 +60,35 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 		client := github.NewClient(tc)
 
 		repoCfg := &github.Repository{
-			Name:    github.String("test-repo1"),
+			Name:    github.String("test-repo"),
 			Private: github.Bool(true),
 			// TODO: add in any other important configs
 		}
 
-		// We don't care about the resp pagination, we might care about the rate for the future though
-		repo, _, err := client.Repositories.Create(ctx, "", repoCfg)
+		repo, resp, err := client.Repositories.Create(ctx, "", repoCfg)
+		if _, ok := err.(*github.RateLimitError); ok {
+			log.Println("hit rate limit")
+			w.WriteHeader(r.Response.StatusCode)
+			return
+		}
+		if _, ok := err.(*github.AcceptedError); ok {
+			w.WriteHeader(r.Response.StatusCode)
+			w.Write([]byte(`Github 202 Accepted`))
+			return
+		}
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Println(resp.Status)
 			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 
 		setRepoURL(path)
 
-		w.WriteHeader(http.StatusAccepted)
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(repo)
 	default:
-		fmt.Fprintf(w, "Only POST is supported")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte(`Only POST is supported`))
 	}
 }
 
@@ -121,7 +133,7 @@ func StartServer() {
 		WriteTimeout: timeout,
 	}
 
-	testTemplate()
+	// testTemplate()
 	http.HandleFunc("/health", HealthHandler)
 	http.HandleFunc("/repository", RepoHandler)
 
@@ -139,7 +151,7 @@ func StartServer() {
 		}
 	}()
 
-	fmt.Printf("Starting server at port 8080\n")
+	fmt.Printf("starting server at port 8080\n")
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		fmt.Println(err.Error())
 		return

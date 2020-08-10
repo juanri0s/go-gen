@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	log.Println("auth0-generator has started")
+	log.Println("auth0-CLI has started")
 	app.StartCLI()
 }

@@ -29,67 +29,96 @@ type Metadata struct {
 	GitIgnore   bool
 }
 
-func generateServiceDefault() {
-	fmt.Println("works 1")
+// new returns a new service with default metadata values.
+func (m *Metadata) new() Metadata {
+	return Metadata{
+		ProjectPath: "",
+		Name:        "default-repo",
+		Owner:       "default-owner",
+		Version:     "1.0.0",
+		Copyright:   true,
+		License:     true,
+		Description: "A default service for Auth0",
+		Entrypoint:  "/app",
+		GitIgnore:   true,
+	}
 }
 
-func generateServiceFromFile(f string) {
-	var metadata Metadata
+func generateServiceFromDefault() (string, error) {
+	var m Metadata
+	m = m.new()
+	repo, err := generate(m)
+	if err != nil {
+		return "", err
+	}
+
+	return repo, nil
+}
+
+func generateServiceFromFile(f string) (string, error) {
+	var m Metadata
 	data, err := ioutil.ReadFile(f)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	if strings.Contains(f, "yaml") || strings.Contains(f, "yml") {
-		err = yaml.Unmarshal(data, &metadata)
+		err = yaml.Unmarshal(data, &m)
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 	} else if strings.Contains(f, "json") {
-		err = json.Unmarshal(data, &metadata)
+		err = json.Unmarshal(data, &m)
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 	}
 
 	// Instead of asking the user for a path, we would like them to run the command in the WD they want
-	metadata.ProjectPath, err = os.Getwd()
+	m.ProjectPath, err = os.Getwd()
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
 
-	generate(metadata)
+	repo, err := generate(m)
+	return repo, nil
 }
 
-func generate(m Metadata) {
+func generate(m Metadata) (string, error) {
+	fmt.Println("Generating Go service for", m.Name)
 	c := &http.Client{
 		Timeout: time.Second * 10,
 	}
 
 	req, err := json.Marshal(m)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
-	const url = "http://localhost:8080/respository"
+	const url = "http://localhost:8080/repository"
 	resp, err := c.Post(url, "application/json", bytes.NewBuffer(req))
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
 	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return "", fmt.Errorf("HTTP request failed with HTTP Status: %s", resp.Status)
+	}
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
 	var repo *github.Repository
 	err = json.Unmarshal(body, &repo)
 	if err != nil {
-		panic(err.Error())
+		return "", err
 	}
 
-	fmt.Println(repo.GetURL())
+	return repo.GetHTMLURL(), nil
 }
 
 // StartCLI TODO
@@ -126,12 +155,22 @@ func StartCLI() {
 			Usage:   "generate a new service",
 			Flags:   fileFlag,
 			Action: func(c *cli.Context) error {
+				t := time.Now()
 				f := c.String("file")
 				if f == "" {
-					generateServiceDefault()
+					repo, err := generateServiceFromDefault()
+					if err != nil {
+						return fmt.Errorf("%w", err)
+					}
+					fmt.Println("Service created successfully in %vms - %v", time.Since(t), repo)
+					return nil
 				}
 
-				generateServiceFromFile(f)
+				repo, err := generateServiceFromFile(f)
+				if err != nil {
+					return fmt.Errorf("%w", err)
+				}
+				fmt.Printf("Service created successfully in %vms - %v", time.Since(t), repo)
 				return nil
 			},
 		},
