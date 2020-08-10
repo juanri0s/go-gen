@@ -69,7 +69,7 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 
 		repo, _, err := client.Repositories.Create(ctx, "", repoCfg)
 		if _, ok := err.(*github.RateLimitError); ok {
-			log.Println("hit rate limit")
+			log.Warn("hit rate limit")
 			w.WriteHeader(r.Response.StatusCode)
 			return
 		}

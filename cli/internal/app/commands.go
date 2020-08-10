@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/google/go-github/github"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v2"
 )
@@ -85,7 +85,9 @@ func generateServiceFromFile(f string) (string, error) {
 }
 
 func generate(m Metadata) (string, error) {
-	fmt.Println("Generating Go service for", m.Name)
+	log.WithFields(log.Fields{
+		"repo-name": m.Name,
+	}).Info("Generating Go service")
 	c := &http.Client{
 		Timeout: time.Second * 10,
 	}
@@ -157,20 +159,24 @@ func StartCLI() {
 			Action: func(c *cli.Context) error {
 				t := time.Now()
 				f := c.String("file")
+				var repo string
+				var err error
 				if f == "" {
-					repo, err := generateServiceFromDefault()
+					repo, err = generateServiceFromDefault()
 					if err != nil {
 						return fmt.Errorf("%w", err)
 					}
-					fmt.Println("Service created successfully in %vms - %v", time.Since(t), repo)
-					return nil
+				} else {
+					repo, err = generateServiceFromFile(f)
+					if err != nil {
+						return fmt.Errorf("%w", err)
+					}
 				}
 
-				repo, err := generateServiceFromFile(f)
-				if err != nil {
-					return fmt.Errorf("%w", err)
-				}
-				fmt.Printf("Service created successfully in %vms - %v", time.Since(t), repo)
+				log.WithFields(log.Fields{
+					"repo-link":      repo,
+					"execution-time": time.Since(t),
+				}).Info("Service created successfully")
 				return nil
 			},
 		},
