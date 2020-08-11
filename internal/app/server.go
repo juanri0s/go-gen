@@ -53,14 +53,14 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 		err := initGit(m.ProjectPath)
 		if err != nil {
 			log.Error(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
 		err = setupService(m)
 		if err != nil {
 			log.Error(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
@@ -88,21 +88,16 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(r.Response.StatusCode)
 			return
 		}
-		if _, ok := err.(*github.AcceptedError); ok {
-			w.WriteHeader(r.Response.StatusCode)
-			w.Write([]byte(`Github 202 Accepted`))
-			return
-		}
 		if err != nil {
 			log.Error(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
 		err = setRepoURL(m.ProjectPath, repo.GetGitURL())
 		if err != nil {
 			log.Error("Error setting repo url ", err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 

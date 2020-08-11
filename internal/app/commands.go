@@ -120,6 +120,9 @@ func generateServiceFromFile(f string, token string) (string, error) {
 	g.Token = token
 
 	repo, err := g.generate()
+	if err != nil {
+		return "", err
+	}
 	return repo, nil
 }
 
@@ -203,8 +206,8 @@ func StartCLI(args []string) error {
 				t := time.Now()
 				f := c.String("file")
 				token := c.String("token")
-				var repo string
 				var err error
+				var repo string
 				if f == "" {
 					repo, err = generateServiceFromDefault(token)
 					if err != nil {
