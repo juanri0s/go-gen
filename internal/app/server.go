@@ -97,7 +97,7 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 
 		err = setRepoURL(m.ProjectPath, repo.GetGitURL())
 		if err != nil {
-			log.Error("Error setting repo url ", err.Error())
+			log.Error("Error setting repo url -", err.Error())
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
