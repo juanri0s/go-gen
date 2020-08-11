@@ -74,7 +74,7 @@ func makeDirForEntrypoint(m Metadata) error {
 	return nil
 }
 
-// addFileFromTemplate tempaltes a file based on the fileType and matching template.
+// addFileFromTemplate templates a file based on the fileType and matching template.
 func addFileFromTemplate(fType string, m Metadata) error {
 	var tmplPath string
 	var path string
@@ -108,7 +108,7 @@ func addFileFromTemplate(fType string, m Metadata) error {
 	if err != nil {
 		return fmt.Errorf("unable to read template file from %s  - %w", tmplPath, err)
 	}
-	// Create a template, add the function map, and parse the text.
+	// Create a template and parse the text.
 	tmpl, err := template.New("Main").Parse(string(templateF))
 	if err != nil {
 		return fmt.Errorf("unable to parse template file - %w", err)
