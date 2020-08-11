@@ -54,7 +54,7 @@ providing a spec file allows you to customize the service being created, otherwi
   "entrypoint": "custom-json-service",
   "hasGitignore": true,
   "isPrivate": true,
-  "imports": ["fmt"]
+  "imports": ["fmt"],
   "mainBranch": "main"
 }
 ```
