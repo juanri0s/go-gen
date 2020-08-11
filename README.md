@@ -16,11 +16,11 @@ Since the service interacts with the Github API, you'll need a valid access toke
 
 Make a new project directory where the service will be created for you
 ```
-mkdir -p $GOPATH/src/github.com/{GH_USERNAME}/{PROJECT_NAME}
+mkdir -p $GOPATH/src/{PROJECT_NAME}
 ```
 
 ```
-cd $GOPATH/src/github.com/{GH_USERNAME}/{PROJECT_NAME}
+cd $GOPATH/src/{PROJECT_NAME}
 ```
 
 ### Creater spec file (optional)
@@ -38,7 +38,7 @@ providing a spec file allows you to customize the service being created, otherwi
  entrypoint: "custom-yaml-service"
  hasGitignore: true
  isPrivate: true
- imports: '"fmt"'
+ imports: ["fmt"]
  mainBranch: "main"
 ```
 
@@ -54,7 +54,7 @@ providing a spec file allows you to customize the service being created, otherwi
   "entrypoint": "custom-json-service",
   "hasGitignore": true,
   "isPrivate": true,
-  "imports": "\"fmt\"",
+  "imports": ["fmt"]
   "mainBranch": "main"
 }
 ```
