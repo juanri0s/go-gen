@@ -115,7 +115,7 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// initGit initializes a project as a git project
+// initGit initializes a project as a git project.
 func initGit(p string) error {
 	if p == "" {
 		return fmt.Errorf("invalid path")

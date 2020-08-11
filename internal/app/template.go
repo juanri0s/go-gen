@@ -33,7 +33,7 @@ func setupService(m Metadata) error {
 		}
 	}
 
-	err = makeDirForEntry(m)
+	err = makeDirForEntrypoint(m)
 	if err != nil {
 		return err
 	}
@@ -51,8 +51,8 @@ func setupService(m Metadata) error {
 	return nil
 }
 
-// makeDir sets up the main logic directory with entrypoint.
-func makeDirForEntry(m Metadata) error {
+// makeDirForEntrypoint sets up the main logic directory with entrypoint.
+func makeDirForEntrypoint(m Metadata) error {
 	if m.ProjectPath == "" {
 		return fmt.Errorf("Invalid project path from metadata")
 	}

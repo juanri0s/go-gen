@@ -31,7 +31,7 @@ func Test_makeDirForEntry(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := makeDirForEntry(tt.args.m); (err != nil) != tt.wantErr {
+			if err := makeDirForEntrypoint(tt.args.m); (err != nil) != tt.wantErr {
 				t.Errorf("makeDirForEntry() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
