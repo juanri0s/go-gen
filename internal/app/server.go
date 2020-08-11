@@ -74,6 +74,7 @@ func RepoHandler(w http.ResponseWriter, r *http.Request) {
 			Private:       github.Bool(m.IsPrivate),
 			AutoInit:      github.Bool(true),
 			DefaultBranch: github.String(m.MainBranch),
+			Description:   github.String(m.Description),
 			// TODO: add in any other important configs
 		}
 
