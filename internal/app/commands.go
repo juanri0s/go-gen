@@ -23,18 +23,18 @@ type Generator struct {
 
 // Metadata is the metadata used to create a new service.
 type Metadata struct {
-	ProjectPath  string
-	Name         string
-	Owner        string
-	Version      string
-	HasCopyright bool
-	HasLicense   bool
-	Imports      string
-	Description  string
-	Entrypoint   string
-	HasGitIgnore bool
-	MainBranch   string
-	IsPrivate    bool
+	ProjectPath  string   `yaml:"projectPath,omitempty"`
+	Name         string   `yaml:"name"`
+	Owner        string   `yaml:"owner"`
+	Version      string   `yaml:"version"`
+	Imports      []string `yaml:"imports,flow"`
+	Description  string   `yaml:"description"`
+	Entrypoint   string   `yaml:"entrypoint"`
+	MainBranch   string   `yaml:"mainBranch"`
+	HasCopyright bool     `yaml:"hasCopyright"`
+	HasLicense   bool     `yaml:"hasLicense"`
+	HasGitIgnore bool     `yaml:"hasGitignore"`
+	IsPrivate    bool     `yaml:"isPrivate"`
 }
 
 // new returns a new service with default metadata values.

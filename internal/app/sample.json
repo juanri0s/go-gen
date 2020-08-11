@@ -8,6 +8,6 @@
   "entrypoint": "custom-json-service",
   "hasGitignore": true,
   "isPrivate": true,
-  "imports": "\"fmt\"",
+  "imports": ["fmt"],
   "mainBranch": "main"
 }

@@ -10,7 +10,7 @@ import (
 )
 
 // DefaultImports represents the default imports that we want the initial service to have.
-const DefaultImports = `"fmt"`
+var DefaultImports = []string{"fmt"}
 
 // setupService sets up a service based on the configuration metadata.
 func setupService(m Metadata) error {
@@ -20,14 +20,14 @@ func setupService(m Metadata) error {
 	}
 
 	if m.HasGitIgnore {
-		err = addFileFromTemplate("gitignore", m)
+		err := addFileFromTemplate("gitignore", m)
 		if err != nil {
 			return err
 		}
 	}
 
 	if m.HasLicense {
-		err = addFileFromTemplate("license", m)
+		err := addFileFromTemplate("license", m)
 		if err != nil {
 			return err
 		}
@@ -87,17 +87,17 @@ func addFileFromTemplate(fType string, m Metadata) error {
 		break
 	case "docker":
 		tmplPath = "internal/app/templates/dockerfile.tmpl"
-		path = m.ProjectPath
+		path = m.ProjectPath + "/"
 		file = "Dockerfile"
 		break
 	case "license":
 		tmplPath = "internal/app/templates/license.tmpl"
-		path = m.ProjectPath
+		path = m.ProjectPath + "/"
 		file = "LICENSE"
 		break
 	case "gitignore":
 		tmplPath = "internal/app/templates/gitignore.tmpl"
-		path = m.ProjectPath
+		path = m.ProjectPath + "/"
 		file = ".gitignore"
 		break
 	default:
@@ -109,7 +109,7 @@ func addFileFromTemplate(fType string, m Metadata) error {
 		return fmt.Errorf("unable to read template file from %s  - %w", tmplPath, err)
 	}
 	// Create a template, add the function map, and parse the text.
-	tmpl, err := template.New("").Parse(string(templateF))
+	tmpl, err := template.New("Main").Parse(string(templateF))
 	if err != nil {
 		return fmt.Errorf("unable to parse template file - %w", err)
 	}

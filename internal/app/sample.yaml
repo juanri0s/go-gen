@@ -7,5 +7,5 @@ description: "A custom auth0 service from a yaml spec"
 entrypoint: "custom-yaml-service"
 hasGitignore: true
 isPrivate: true
-imports: '\"fmt\"'
+imports: ["fmt"]
 mainBranch: "main"
