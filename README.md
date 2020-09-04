@@ -1,5 +1,5 @@
-# auth0-exercise
-`auth0-exercise` is a go service that allows users to provision a new service based on their specs
+# go-gen
+`go-gen` is a go service that allows users to provision a new service based on their specs
 
 There are two parts to the service
 1. The api that handles a bulk of the service provisioning logic
@@ -34,7 +34,7 @@ providing a spec file allows you to customize the service being created, otherwi
  version: "1.0.0"
  hasCopyright: true
  hasLicense: true
- description: "A custom auth0 service from a yaml spec"
+ description: "A custom go service from a yaml spec"
  entrypoint: "custom-yaml-service"
  hasGitignore: true
  isPrivate: true
@@ -50,7 +50,7 @@ providing a spec file allows you to customize the service being created, otherwi
   "version": "1.0.0",
   "hasCopyright": true,
   "hasLicense": true,
-  "description": "A custom auth0 service from a json spec",
+  "description": "A custom go service from a json spec",
   "entrypoint": "custom-json-service",
   "hasGitignore": true,
   "isPrivate": true,
@@ -63,12 +63,12 @@ providing a spec file allows you to customize the service being created, otherwi
 
 For a default service
 ```
-auth0-exercise generate --token={GH_TOKEN}
+go-gen generate --token={GH_TOKEN}
 ```
 
 For a configured service
 ```
-auth0-exercise generate --token={GH_TOKEN} --file={spec.yaml OR spec.json}
+go-gen generate --token={GH_TOKEN} --file={spec.yaml OR spec.json}
 ```
 
 ## Dependencies
@@ -80,7 +80,7 @@ auth0-exercise generate --token={GH_TOKEN} --file={spec.yaml OR spec.json}
 - `github.com/sirupsen/logrus` - server logging
 
 ## License
-`auth0-exercise` is licensed under the MIT License. Please see the LICENSE file for details.
+`go-gen` is licensed under the MIT License. Please see the LICENSE file for details.
 
 ## Roadmap
 - [ ] More Test Coverage
