@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/juanri0s/auth0-exercise/internal/app"
+	"github.com/juanri0s/go-gen/internal/app"
 )
 
 func main() {

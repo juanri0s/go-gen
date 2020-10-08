@@ -11,7 +11,7 @@ import (
 func TestMetadata_new(t *testing.T) {
 	var m *Metadata
 	def := Metadata{
-		Description:  "A default service for auth0",
+		Description:  "A default service",
 		Entrypoint:   "default-service",
 		HasCopyright: true,
 		HasGitIgnore: true,
@@ -30,7 +30,7 @@ func TestMetadata_new(t *testing.T) {
 		want Metadata
 	}{
 		{
-			name: "default metadata is accuraterlyreturned",
+			name: "default metadata is accurately returned",
 			m:    m,
 			want: def,
 		},

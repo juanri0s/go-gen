@@ -3,7 +3,7 @@ owner: "Juan"
 version: "1.0.0"
 hasCopyright: true
 hasLicense: true
-description: "A custom auth0 service from a yaml spec"
+description: "A custom service from a yaml spec"
 entrypoint: "custom-yaml-service"
 hasGitignore: true
 isPrivate: true

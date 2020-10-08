@@ -11,7 +11,7 @@ COPY . ./
 
 # Build the binary.
 # -mod=readonly ensures immutable go.mod and go.sum in container builds.
-RUN CGO_ENABLED=0 go build -mod=readonly -o runtime ./cmd/auth0-api
+RUN CGO_ENABLED=0 go build -mod=readonly -o runtime ./cmd/go-gen-api
 
 # Use the official Alpine image for a lean production container.
 # https://hub.docker.com/_/alpine

@@ -1,4 +1,4 @@
-module github.com/juanri0s/auth0-exercise
+module github.com/juanri0s/go-gen
 
 go 1.13
 

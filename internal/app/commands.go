@@ -45,7 +45,7 @@ func (m *Metadata) new() Metadata {
 		Owner:        "default-owner",
 		Version:      "1.0.0",
 		Imports:      DefaultImports,
-		Description:  "A default service for auth0",
+		Description:  "A default service",
 		Entrypoint:   "default-service",
 		MainBranch:   "main",
 		IsPrivate:    true,
@@ -128,7 +128,7 @@ func generateServiceFromFile(f string, token string) (string, error) {
 
 // generate takes a generator and generates the service through the api.
 func (g *Generator) generate() (string, error) {
-	fmt.Printf("generating auth0 service for %s\n", g.Metadata.Name)
+	fmt.Printf("generating service for %s\n", g.Metadata.Name)
 	c := &http.Client{
 		Timeout: time.Second * 10,
 	}
@@ -167,12 +167,12 @@ func (g *Generator) generate() (string, error) {
 // StartCLI initializes the CLI start and exit.
 func StartCLI(args []string) error {
 	app := &cli.App{
-		Name:  "auth0-exercise-cli",
+		Name:  "go-gen-cli",
 		Usage: "interact with the service provisioner",
 		Authors: []*cli.Author{
 			{
 				Name:  "Creator",
-				Email: "creator@auth0.com",
+				Email: "creator@gen.com",
 			},
 		},
 		Copyright: `
@@ -200,7 +200,7 @@ func StartCLI(args []string) error {
 		{
 			Name:    "generate",
 			Aliases: []string{"g"},
-			Usage:   "generate a new Auth0 service",
+			Usage:   "generate a new service",
 			Flags:   flags,
 			Action: func(c *cli.Context) error {
 				t := time.Now()
@@ -219,7 +219,7 @@ func StartCLI(args []string) error {
 						return fmt.Errorf("%w", err)
 					}
 				}
-				fmt.Printf("successfully created auth0 service for %s in %dms\n", repo, time.Since(t).Milliseconds())
+				fmt.Printf("successfully created service for %s in %dms\n", repo, time.Since(t).Milliseconds())
 				return nil
 			},
 		},

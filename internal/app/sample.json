@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "hasCopyright": true,
   "hasLicense": true,
-  "description": "A custom auth0 service from a json spec",
+  "description": "A custom service from a json spec",
   "entrypoint": "custom-json-service",
   "hasGitignore": true,
   "isPrivate": true,
